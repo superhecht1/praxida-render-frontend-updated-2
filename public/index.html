@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praxida 2.0 - KI-Assistenz für Therapeuten</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            min-height: calc(100vh - 40px);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .logo h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .logo .version {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-tab {
+            padding: 15px 20px;
+            border: none;
+            background: #f8f9ff;
+            color: #667eea;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+        
+        .nav-tab:hover {
+            background: #eef2ff;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .nav-tab .icon {
+            font-size: 16px;
+        }
+        
+        .nav-tab .badge {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: auto;
+        }
+        
+        .nav-tab:not(.active) .badge {
+            background: #667eea;
+            color: white;
+        }
+        
+        .quick-actions {
+            background: linear-gradient(135deg, #f8f9ff, #eef2ff);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #eef2ff;
+        }
+        
+        .quick-actions h4 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: border-color 0.2s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f1f1f1;
+            color: #666;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #eef2ff;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .section-subtitle {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9ff, #eef2ff);
+            padding: 30px;
+            border-radius: 18px;
+            text-align: center;
+            border: 2px solid #eef2ff;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .feature-showcase {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 35px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-showcase::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1), transparent 70%);
+        }
+        
+        .feature-showcase h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .feature-showcase p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+        
+        .feature-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .feature-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-2px);
+        }
+        
+        .client-grid {
+            display: grid;
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .client-card {
+            background: #f8f9ff;
+            border: 3px solid #eef2ff;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .client-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+        }
+        
+        .client-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+        }
+        
+        .client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .client-initials {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .client-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            background: rgba(102,126,234,0.1);
+            color: #667eea;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .client-card.selected .tag {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .client-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        
+        .client-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Audio Transcription Styles */
+        .audio-upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s;
+            margin-bottom: 25px;
+        }
+        
+        .audio-upload-zone.dragover {
+            border-color: #764ba2;
+            background: #eef2ff;
+        }
+        
+        .audio-upload-zone.uploading {
+            background: linear-gradient(135deg, #f8f9ff, #eef2ff);
+            border-color: #667eea;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        
+        .upload-text p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .audio-controls {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .recording-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            border: 2px solid #eef2ff;
+        }
+        
+        .recording-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4757;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .record-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .record-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+        
+        .record-btn.recording {
+            background: linear-gradient(135deg, #ff4757, #c44569);
+            animation: recordPulse 1.5s infinite;
+        }
+        
+        @keyframes recordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Chat Interface */
+        .chat-interface {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            height: 700px;
+        }
+        
+        .chat-header {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            border: 2px solid #eef2ff;
+        }
+        
+        .messages {
+            overflow-y: auto;
+            padding: 25px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            border: 2px solid #eef2ff;
+            scroll-behavior: smooth;
+        }
+        
+        .message {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 18px;
+            max-width: 85%;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .message.user {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin-left: auto;
+        }
+        
+        .message.assistant {
+            background: white;
+            border: 2px solid #eef2ff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .message-meta {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+        
+        .input-area {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .message-input {
+            padding: 18px 20px;
+            border: 2px solid #eef2ff;
+            border-radius: 15px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+        
+        .message-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .send-btn {
+            padding: 18px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eef2ff;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            color: #667eea;
+            font-weight: 700;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .close-btn:hover {
+            background: #f1f1f1;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        .form-textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eef2ff;
+        }
+        
+        /* Search Results */
+        .search-results {
+            max-height: 600px;
+            overflow-y: auto;
+            margin-top: 25px;
+        }
+        
+        .search-result {
+            background: #f8f9ff;
+            border: 2px solid #eef2ff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .search-result:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .result-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .result-section {
+            margin-bottom: 15px;
+        }
+        
+        .result-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .result-text {
+            background: #f8f9ff;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        /* Therapy Planning Styles */
+        .therapy-plan {
+            background: linear-gradient(135deg, #f8f9ff, #eef2ff);
+            border: 2px solid #eef2ff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .plan-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .plan-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+        
+        .plan-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            line-height: 1.6;
+        }
+        
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+            position: relative;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #eef2ff;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            transform: translate(-50%, -50%);
+        }
+        
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #666;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 20px;
+        }
+        
+        .empty-state p {
+            line-height: 1.6;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 280px 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+                min-height: auto;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .feature-buttons {
+                justify-content: center;
+            }
+            
+            .chat-interface {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .send-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Praxida</h1>
+                <span class="version">2.0</span>
+                <p>KI-Assistenz für Therapeuten</p>
+            </div>
+            
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('overview')">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('clients')">
+                    <span class="icon">👥</span>
+                    <span>Klient:innen</span>
+                    <span class="badge" id="clientsBadge">0</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('audio')">
+                    <span class="icon">🎤</span>
+                    <span>Audio-Protokolle</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('chat')">
+                    <span class="icon">💬</span>
+                    <span>KI-Chat</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('planning')">
+                    <span class="icon">📋</span>
+                    <span>Therapieplanung</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('todos')">
+                    <span class="icon">✅</span>
+                    <span>To-Dos & Erinnerungen</span>
+                    <span class="badge" id="todosBadge">0</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('team')">
+                    <span class="icon">👥</span>
+                    <span>Team-Kollaboration</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('search')">
+                    <span class="icon">🔍</span>
+                    <span>Verlaufssuche</span>
+                </button>
+                <button class="nav-tab" onclick="showSection('summary')">
+                    <span class="icon">📄</span>
+                    <span>Zusammenfassung</span>
+                </button>
+            </div>
+            
+            <div class="quick-actions">
+                <h4>🚀 Schnellaktionen</h4>
+                <input type="text" class="search-input" placeholder="Schnellsuche..." id="quickSearch">
+                <div style="display: grid; gap: 10px;">
+                    <select class="search-input" id="quickClient">
+                        <option value="">Klient:in auswählen</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="performQuickSearch()">
+                        <span>🔍</span> Suchen
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Dashboard -->
+            <div id="overview" class="content-section active">
+                <div class="section-header">
+                    <h2 class="section-title">Dashboard</h2>
+                    <p class="section-subtitle">Ihre komplette Praxisverwaltung mit KI-Unterstützung</p>
+                </div>
+                
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalClients">12</div>
+                        <div class="stat-label">Aktive Klient:innen</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalSessions">248</div>
+                        <div class="stat-label">Gesamte Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingTodos">5</div>
+                        <div class="stat-label">Offene To-Dos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activePlans">3</div>
+                        <div class="stat-label">Aktive Therapiepläne</div>
+                    </div>
+                </div>
+                
+                <div class="feature-showcase">
+                    <h3>🎯 Neue Profi-Features in Version 2.0</h3>
+                    <p>
+                        <strong>Intelligente Audio-Transkription:</strong> Sprich frei – die KI erstellt präzise Protokolle deiner Sitzungen oder Sprechstunden.<br>
+                        <strong>KI-gestützte Vor- und Nachbereitung:</strong> Automatische To-Dos und Erinnerungen für optimale Patient:innenbetreuung.<br>
+                        <strong>Sichere Team-Kollaboration:</strong> DSGVO-konforme Zusammenarbeit mit Supervisor:innen und Kollegen.
+                    </p>
+                    <div class="feature-buttons">
+                        <button class="feature-btn" onclick="showSection('audio')">
+                            🎤 Audio-Protokolle
+                        </button>
+                        <button class="feature-btn" onclick="showSection('planning')">
+                            📋 Therapieplanung
+                        </button>
+                        <button class="feature-btn" onclick="showSection('team')">
+                            👥 Team-Features
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Klient:innen Section -->
+            <div id="clients" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Klient:innen-Verwaltung</h2>
+                    <p class="section-subtitle">Übersicht aller aktiven Patient:innen und deren Behandlungsverläufe</p>
+                </div>
+                
+                <div style="margin-bottom: 30px; display: flex; gap: 15px;">
+                    <button class="btn btn-primary" onclick="showModal('clientModal')">
+                        <span>➕</span> Neue:n Klient:in hinzufügen
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportClients()">
+                        <span>📄</span> Exportieren
+                    </button>
+                </div>
+
+                <div class="client-grid" id="clientGrid">
+                    <div class="client-card" onclick="selectClient(this, 'client1')">
+                        <div class="client-header">
+                            <div class="client-initials">A.M.</div>
+                            <div class="client-meta">
+                                <span class="tag">Angststörung</span>
+                                <span class="tag">VT</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Sitzung: 18.08.2025</span>
+                            <span>🔢 Sessions: 12</span>
+                        </div>
+                    </div>
+                    
+                    <div class="client-card" onclick="selectClient(this, 'client2')">
+                        <div class="client-header">
+                            <div class="client-initials">B.S.</div>
+                            <div class="client-meta">
+                                <span class="tag">Depression</span>
+                                <span class="tag">TPT</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Sitzung: 20.08.2025</span>
+                            <span>🔢 Sessions: 8</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio-Protokolle Section -->
+            <div id="audio" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Audio-Protokolle</h2>
+                    <p class="section-subtitle">Intelligente Transkription und Protokollerstellung Ihrer Therapiesitzungen</p>
+                </div>
+
+                <div class="audio-upload-zone" id="audioUpload">
+                    <div class="upload-icon">🎤</div>
+                    <div class="upload-text">
+                        <h3>Audio-Datei hochladen oder aufnehmen</h3>
+                        <p>Ziehen Sie eine Audio-Datei hierher oder klicken Sie, um eine Datei auszuwählen.<br>
+                        Unterstützte Formate: MP3, WAV, M4A, OGG</p>
+                        <button class="btn btn-primary">
+                            <span>📁</span> Datei auswählen
+                        </button>
+                    </div>
+                </div>
+
+                <div class="audio-controls">
+                    <div class="recording-status" id="recordingStatus" style="display: none;">
+                        <div class="recording-dot"></div>
+                        <span>Aufnahme läuft... <span id="recordTime">00:00</span></span>
+                    </div>
+                    <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
+                        🎤
+                    </button>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-icon">🎧</div>
+                    <h3>Noch keine Audio-Protokolle vorhanden</h3>
+                    <p>Laden Sie eine Audio-Datei hoch oder starten Sie eine Live-Aufnahme, um automatisch strukturierte Therapieprotokolle zu erstellen.</p>
+                </div>
+            </div>
+
+            <!-- KI-Chat Section -->
+            <div id="chat" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">KI-Assistenz Chat</h2>
+                    <p class="section-subtitle">Professionelle Beratung zu Therapiemethoden, Diagnosen und Behandlungsansätzen</p>
+                </div>
+
+                <div class="chat-interface">
+                    <div class="chat-header">
+                        <span>🤖</span>
+                        <strong>Praxida KI-Assistenz</strong>
+                        <span style="margin-left: auto; color: #4facfe;">● Online</span>
+                    </div>
+                    
+                    <div class="messages" id="chatMessages">
+                        <div class="message assistant">
+                            <div class="message-meta">KI-Assistenz • Heute 14:30</div>
+                            Hallo! Ich bin Ihre KI-Assistenz für therapeutische Fragen. Ich kann Ihnen helfen bei:
+                            <br><br>
+                            • Therapieansätzen und -methoden<br>
+                            • Diagnostischen Überlegungen<br>
+                            • Behandlungsplanung<br>
+                            • Fachlicher Supervision<br><br>
+                            Wie kann ich Sie heute unterstützen?
+                        </div>
+                    </div>
+                    
+                    <div class="input-area">
+                        <textarea class="message-input" id="chatInput" placeholder="Ihre Frage an die KI-Assistenz..."></textarea>
+                        <button class="send-btn" onclick="sendMessage()">
+                            Senden
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Therapieplanung Section -->
+            <div id="planning" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Therapieplanung</h2>
+                    <p class="section-subtitle">KI-gestützte Behandlungsplanung und Verlaufsdokumentation</p>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <button class="btn btn-primary" onclick="showModal('planModal')">
+                        <span>➕</span> Neuen Therapieplan erstellen
+                    </button>
+                </div>
+
+                <div class="therapy-plan">
+                    <div class="plan-header">
+                        <div class="plan-title">Kognitiv-behaviorale Therapie - A.M.</div>
+                        <div class="plan-status status-active">Aktiv</div>
+                    </div>
+                    <div class="plan-content">
+                        <strong>Therapieziele:</strong><br>
+                        1. Reduktion der Angstsymptomatik um 50%<br>
+                        2. Verbesserung der sozialen Kompetenz<br>
+                        3. Entwicklung von Bewältigungsstrategien<br><br>
+                        
+                        <strong>Nächste Schritte:</strong><br>
+                        • Exposition in vivo (Woche 8-10)<br>
+                        • Kognitive Umstrukturierung vertiefen<br>
+                        • Rückfallprophylaxe planen
+                    </div>
+                </div>
+            </div>
+
+            <!-- To-Dos Section -->
+            <div id="todos" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">To-Dos & Erinnerungen</h2>
+                    <p class="section-subtitle">Automatisch generierte Aufgaben und Termine aus Ihren Therapiesitzungen</p>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <button class="btn btn-primary" onclick="showModal('todoModal')">
+                        <span>➕</span> Neue Aufgabe hinzufügen
+                    </button>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-icon">✅</div>
+                    <h3>Alle Aufgaben erledigt!</h3>
+                    <p>Aktuell sind keine offenen To-Dos vorhanden. Neue Aufgaben werden automatisch aus Ihren Therapieprotokollen generiert.</p>
+                </div>
+            </div>
+
+            <!-- Team-Kollaboration Section -->
+            <div id="team" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Team-Kollaboration</h2>
+                    <p class="section-subtitle">DSGVO-konforme Zusammenarbeit mit Supervisor:innen und Kollegen</p>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-icon">👥</div>
+                    <h3>Team-Features aktivieren</h3>
+                    <p>Laden Sie Supervisor:innen und Kollegen ein, um sicher zusammenzuarbeiten und Fälle zu besprechen.</p>
+                    <br>
+                    <button class="btn btn-primary">
+                        <span>✉️</span> Team-Mitglied einladen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Verlaufssuche Section -->
+            <div id="search" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Verlaufssuche</h2>
+                    <p class="section-subtitle">Intelligente Suche in allen Therapieprotokollen und Dokumenten</p>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <input type="text" class="search-input" placeholder="Suchen Sie in Protokollen, Notizen, Diagnosen..." id="mainSearch" style="margin-bottom: 15px;">
+                    <div style="display: flex; gap: 15px;">
+                        <select class="search-input" style="width: 200px;">
+                            <option>Alle Klient:innen</option>
+                            <option>A.M.</option>
+                            <option>B.S.</option>
+                        </select>
+                        <select class="search-input" style="width: 200px;">
+                            <option>Alle Zeiträume</option>
+                            <option>Letzte Woche</option>
+                            <option>Letzter Monat</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="performSearch()">
+                            <span>🔍</span> Suchen
+                        </button>
+                    </div>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <h3>Suche starten</h3>
+                    <p>Geben Sie einen Suchbegriff ein, um in allen Therapieprotokollen und Dokumenten zu suchen.</p>
+                </div>
+            </div>
+
+            <!-- Zusammenfassung Section -->
+            <div id="summary" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Zusammenfassung</h2>
+                    <p class="section-subtitle">KI-generierte Berichte und Verlaufszusammenfassungen</p>
+                </div>
+
+                <div style="margin-bottom: 30px; display: flex; gap: 15px;">
+                    <button class="btn btn-primary">
+                        <span>📊</span> Wochenbericht generieren
+                    </button>
+                    <button class="btn btn-secondary">
+                        <span>📈</span> Fortschrittsbericht
+                    </button>
+                    <button class="btn btn-success">
+                        <span>📄</span> Export für Kostenträger
+                    </button>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <h3>Berichte generieren</h3>
+                    <p>Erstellen Sie automatische Zusammenfassungen und Berichte für Ihre Therapieverläufe.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Client Modal -->
+    <div class="modal" id="clientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Neue:n Klient:in hinzufügen</h3>
+                <button class="close-btn" onclick="hideModal('clientModal')">×</button>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Initialen</label>
+                    <input type="text" class="form-input" placeholder="A.B.">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Diagnose</label>
+                    <input type="text" class="form-input" placeholder="z.B. F32.1 Depression">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Therapieform</label>
+                    <select class="form-select">
+                        <option>Verhaltenstherapie (VT)</option>
+                        <option>Tiefenpsychologie (TP)</option>
+                        <option>Psychoanalyse (PA)</option>
+                        <option>Systemische Therapie (ST)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notizen</label>
+                    <textarea class="form-textarea" placeholder="Zusätzliche Informationen..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('clientModal')">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Plan Modal -->
+    <div class="modal" id="planModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Neuen Therapieplan erstellen</h3>
+                <button class="close-btn" onclick="hideModal('planModal')">×</button>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Klient:in auswählen</label>
+                    <select class="form-select">
+                        <option>A.M.</option>
+                        <option>B.S.</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Therapieziele</label>
+                    <textarea class="form-textarea" placeholder="Definieren Sie die Hauptziele der Behandlung..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Geplante Interventionen</label>
+                    <textarea class="form-textarea" placeholder="Welche Methoden und Techniken planen Sie einzusetzen?"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('planModal')">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Plan erstellen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Todo Modal -->
+    <div class="modal" id="todoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Neue Aufgabe hinzufügen</h3>
+                <button class="close-btn" onclick="hideModal('todoModal')">×</button>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Aufgabe</label>
+                    <input type="text" class="form-input" placeholder="Was muss erledigt werden?">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Klient:in</label>
+                    <select class="form-select">
+                        <option>Allgemein</option>
+                        <option>A.M.</option>
+                        <option>B.S.</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fälligkeitsdatum</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priorität</label>
+                    <select class="form-select">
+                        <option>Normal</option>
+                        <option>Hoch</option>
+                        <option>Niedrig</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('todoModal')">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Aufgabe erstellen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update navigation
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.closest('.nav-tab').classList.add('active');
+        }
+
+        // Modal functions
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        // Client selection
+        function selectClient(element, clientId) {
+            const cards = document.querySelectorAll('.client-card');
+            cards.forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        // Recording functionality
+        let isRecording = false;
+        let recordingTimer = null;
+        let recordingTime = 0;
+
+        function toggleRecording() {
+            const btn = document.getElementById('recordBtn');
+            const status = document.getElementById('recordingStatus');
+            
+            if (!isRecording) {
+                // Start recording
+                isRecording = true;
+                btn.classList.add('recording');
+                btn.innerHTML = '⏹️';
+                status.style.display = 'flex';
+                
+                recordingTimer = setInterval(() => {
+                    recordingTime++;
+                    const minutes = Math.floor(recordingTime / 60);
+                    const seconds = recordingTime % 60;
+                    document.getElementById('recordTime').textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+            } else {
+                // Stop recording
+                isRecording = false;
+                btn.classList.remove('recording');
+                btn.innerHTML = '🎤';
+                status.style.display = 'none';
+                
+                clearInterval(recordingTimer);
+                recordingTime = 0;
+                
+                // Simulate processing
+                setTimeout(() => {
+                    alert('Aufnahme beendet und wird verarbeitet...');
+                }, 500);
+            }
+        }
+
+        // Chat functionality
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const messages = document.getElementById('chatMessages');
+            
+            if (input.value.trim() === '') return;
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.innerHTML = `
+                <div class="message-meta">Sie • Jetzt</div>
+                ${input.value}
+            `;
+            messages.appendChild(userMessage);
+            
+            // Clear input
+            const messageText = input.value;
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message assistant';
+                aiMessage.innerHTML = `
+                    <div class="message-meta">KI-Assistenz • Jetzt</div>
+                    Das ist eine sehr interessante Frage bezüglich ${messageText}. Basierend auf aktuellen Therapiestandards empfehle ich folgende Ansätze...
+                `;
+                messages.appendChild(aiMessage);
+                messages.scrollTop = messages.scrollHeight;
+            }, 1500);
+            
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Quick search
+        function performQuickSearch() {
+            const searchTerm = document.getElementById('quickSearch').value;
+            const client = document.getElementById('quickClient').value;
+            
+            if (searchTerm || client) {
+                showSection('search');
+                document.getElementById('mainSearch').value = searchTerm;
+                // Simulate search results
+                setTimeout(() => {
+                    alert(`Suche nach "${searchTerm}" ${client ? `für ${client}` : ''} wird durchgeführt...`);
+                }, 500);
+            }
+        }
+
+        // Search functionality
+        function performSearch() {
+            const searchTerm = document.getElementById('mainSearch').value;
+            if (searchTerm.trim() === '') return;
+            
+            // Simulate search
+            alert(`Durchsuche alle Protokolle nach: "${searchTerm}"`);
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update client badge
+            document.getElementById('clientsBadge').textContent = '2';
+            
+            // Add sample clients to quick search
+            const quickClient = document.getElementById('quickClient');
+            quickClient.innerHTML += '<option value="A.M.">A.M.</option>';
+            quickClient.innerHTML += '<option value="B.S.">B.S.</option>';
+            
+            // Simulate loading stats
+            setTimeout(() => {
+                document.getElementById('totalClients').textContent = '12';
+                document.getElementById('totalSessions').textContent = '248';
+                document.getElementById('pendingTodos').textContent = '5';
+                document.getElementById('activePlans').textContent = '3';
+                document.getElementById('todosBadge').textContent = '5';
+            }, 1000);
+        });
+
+        // Audio upload handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadZone = document.getElementById('audioUpload');
+            
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+            
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.classList.remove('dragover');
+            });
+            
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                uploadZone.classList.add('uploading');
+                
+                // Simulate upload and processing
+                setTimeout(() => {
+                    uploadZone.classList.remove('uploading');
+                    alert('Audio-Datei wurde hochgeladen und wird transkribiert...');
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
