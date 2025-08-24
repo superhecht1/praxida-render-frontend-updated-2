@@ -1009,11 +1009,335 @@
             </div>
 
             <!-- Klient:innen Section -->
+            <!-- Klient:innen Section -->
             <div id="clients" class="content-section">
                 <div class="section-header">
                     <h2 class="section-title">Klient:innen-Verwaltung</h2>
                     <p class="section-subtitle">Übersicht aller aktiven Patient:innen und deren Behandlungsverläufe</p>
                 </div>
+
+                <div class="filter-section">
+                    <div class="filter-grid">
+                        <div>
+                            <label class="form-label">Therapieform</label>
+                            <select class="form-select" id="therapyFilter" onchange="filterClients()">
+                                <option value="">Alle Therapieformen</option>
+                                <option value="VT">Verhaltenstherapie</option>
+                                <option value="TPT">Tiefenpsychologie</option>
+                                <option value="ST">Systemische Therapie</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterClients()">
+                                <option value="">Alle Status</option>
+                                <option value="aktiv">Aktiv</option>
+                                <option value="pause">Pause</option>
+                                <option value="abgeschlossen">Abgeschlossen</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Sortierung</label>
+                            <select class="form-select" id="sortOrder" onchange="sortClients()">
+                                <option value="name">Nach Name</option>
+                                <option value="last-session">Letzte Session</option>
+                                <option value="sessions">Anzahl Sessions</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" onclick="showModal('clientModal')">
+                                <span>➕</span> Neuer Klient
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportClients()">
+                                <span>📊</span> Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="client-grid" id="clientGrid">
+                    <div class="client-card" data-diagnosis="angst" data-therapy="VT" data-status="aktiv" onclick="selectClient(this, 'client1')">
+                        <div class="client-header">
+                            <div class="client-initials">A.M.</div>
+                            <div class="client-meta">
+                                <span class="tag">F41.1 Angststörung</span>
+                                <span class="tag">VT</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Session: 22.08.2025</span>
+                            <span>🔢 Sessions: 12/25</span>
+                            <span>⏱️ Seit: März 2025</span>
+                        </div>
+                    </div>
+                    
+                    <div class="client-card" data-diagnosis="depression" data-therapy="TPT" data-status="aktiv" onclick="selectClient(this, 'client2')">
+                        <div class="client-header">
+                            <div class="client-initials">B.S.</div>
+                            <div class="client-meta">
+                                <span class="tag">F32.1 Depression</span>
+                                <span class="tag">TPT</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Session: 20.08.2025</span>
+                            <span>🔢 Sessions: 8/25</span>
+                            <span>⏱️ Seit: Juni 2025</span>
+                        </div>
+                    </div>
+
+                    <div class="client-card" data-diagnosis="trauma" data-therapy="VT" data-status="aktiv" onclick="selectClient(this, 'client3')">
+                        <div class="client-header">
+                            <div class="client-initials">C.K.</div>
+                            <div class="client-meta">
+                                <span class="tag">F43.1 PTBS</span>
+                                <span class="tag">VT</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Session: 19.08.2025</span>
+                            <span>🔢 Sessions: 15/25</span>
+                            <span>⏱️ Seit: Januar 2025</span>
+                        </div>
+                    </div>
+
+                    <div class="client-card" data-diagnosis="angst" data-therapy="VT" data-status="pause" onclick="selectClient(this, 'client4')">
+                        <div class="client-header">
+                            <div class="client-initials">D.L.</div>
+                            <div class="client-meta">
+                                <span class="tag">F40.2 Soziale Phobie</span>
+                                <span class="tag">VT</span>
+                                <span class="tag" style="background: #f093fb; color: white;">Pause</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Session: 05.08.2025</span>
+                            <span>🔢 Sessions: 6/25</span>
+                            <span>⏱️ Seit: Juli 2025</span>
+                        </div>
+                    </div>
+
+                    <div class="client-card" data-diagnosis="persoenlichkeit" data-therapy="ST" data-status="aktiv" onclick="selectClient(this, 'client5')">
+                        <div class="client-header">
+                            <div class="client-initials">E.R.</div>
+                            <div class="client-meta">
+                                <span class="tag">F60.3 Borderline</span>
+                                <span class="tag">ST</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Session: 21.08.2025</span>
+                            <span>🔢 Sessions: 23/25</span>
+                            <span>⏱️ Seit: Oktober 2024</span>
+                        </div>
+                    </div>
+
+                    <div class="client-card" data-diagnosis="depression" data-therapy="VT" data-status="aktiv" onclick="selectClient(this, 'client6')">
+                        <div class="client-header">
+                            <div class="client-initials">F.H.</div>
+                            <div class="client-meta">
+                                <span class="tag">F33.2 Rez. Depression</span>
+                                <span class="tag">VT</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Session: 18.08.2025</span>
+                            <span>🔢 Sessions: 4/25</span>
+                            <span>⏱️ Seit: August 2025</span>
+                        </div>
+                    </div>
+
+                    <div class="client-card" data-diagnosis="angst" data-therapy="TPT" data-status="aktiv" onclick="selectClient(this, 'client7')">
+                        <div class="client-header">
+                            <div class="client-initials">G.W.</div>
+                            <div class="client-meta">
+                                <span class="tag">F41.0 Panikstörung</span>
+                                <span class="tag">TPT</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Session: 23.08.2025</span>
+                            <span>🔢 Sessions: 18/25</span>
+                            <span>⏱️ Seit: Februar 2025</span>
+                        </div>
+                    </div>
+
+                    <div class="client-card" data-diagnosis="trauma" data-therapy="VT" data-status="abgeschlossen" onclick="selectClient(this, 'client8')">
+                        <div class="client-header">
+                            <div class="client-initials">H.T.</div>
+                            <div class="client-meta">
+                                <span class="tag">F43.1 PTBS</span>
+                                <span class="tag">VT</span>
+                                <span class="tag" style="background: #4facfe; color: white;">Abgeschlossen</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <span>📅 Letzte Session: 15.08.2025</span>
+                            <span>🔢 Sessions: 25/25</span>
+                            <span>⏱️ Seit: September 2024</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Klient Details Bereich -->
+                <div class="client-details" id="clientDetails">
+                    <div class="detail-header">
+                        <h3 id="selectedClientName">Klient:in auswählen</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="showModal('sessionModal')">
+                                <span>📝</span> Neue Session
+                            </button>
+                            <button class="btn btn-warning" onclick="editClient()">
+                                <span>✏️</span> Bearbeiten
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="detail-tabs">
+                        <button class="detail-tab active" onclick="showDetailTab('overview-tab')">Übersicht</button>
+                        <button class="detail-tab" onclick="showDetailTab('sessions-tab')">Sessions</button>
+                        <button class="detail-tab" onclick="showDetailTab('timeline-tab')">Verlauf</button>
+                        <button class="detail-tab" onclick="showDetailTab('notes-tab')">Notizen</button>
+                    </div>
+
+                    <div class="detail-content active" id="overview-tab">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number" id="clientSessions">12</div>
+                                <div class="stat-label">Absolvierte Sessions</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="clientProgress">65%</div>
+                                <div class="stat-label">Therapiefortschritt</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="clientAttendance">92%</div>
+                                <div class="stat-label">Teilnahmequote</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="nextSession">3</div>
+                                <div class="stat-label">Tage bis nächste Session</div>
+                            </div>
+                        </div>
+
+                        <div style="background: #f8f9ff; padding: 25px; border-radius: 15px; border: 2px solid #eef2ff; margin-top: 20px;">
+                            <h4 style="color: #667eea; margin-bottom: 15px;">🎯 Aktuelle Therapieziele</h4>
+                            <div id="therapyGoals">
+                                <p>• Reduktion der Angstsymptomatik um 50%</p>
+                                <p>• Verbesserung der sozialen Kompetenz</p>
+                                <p>• Entwicklung von Bewältigungsstrategien</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-content" id="sessions-tab">
+                        <div class="session-list">
+                            <div class="session-item">
+                                <div class="session-header">
+                                    <div class="session-date">22. August 2025</div>
+                                    <div class="session-duration">50 Min.</div>
+                                </div>
+                                <div class="session-notes">
+                                    Fortschritte in der kognitiven Umstrukturierung. Patient berichtet über weniger nächtliche Grübeleien. Hausaufgaben wurden vollständig bearbeitet.
+                                </div>
+                            </div>
+
+                            <div class="session-item">
+                                <div class="session-header">
+                                    <div class="session-date">15. August 2025</div>
+                                    <div class="session-duration">50 Min.</div>
+                                </div>
+                                <div class="session-notes">
+                                    Einführung neuer Entspannungstechniken. Progressive Muskelentspannung wurde gut angenommen. Nächste Woche: Exposition in vivo beginnen.
+                                </div>
+                            </div>
+
+                            <div class="session-item">
+                                <div class="session-header">
+                                    <div class="session-date">08. August 2025</div>
+                                    <div class="session-duration">50 Min.</div>
+                                </div>
+                                <div class="session-notes">
+                                    Bearbeitung automatischer Gedanken. Patient zeigt gute Compliance. Stimmung hat sich seit letzter Woche verbessert.
+                                </div>
+                            </div>
+
+                            <div class="session-item">
+                                <div class="session-header">
+                                    <div class="session-date">01. August 2025</div>
+                                    <div class="session-duration">50 Min.</div>
+                                </div>
+                                <div class="session-notes">
+                                    Psychoedukation zu Angststörungen. Erklärung des Teufelskreises der Angst. Patient zeigt gutes Verständnis für die Zusammenhänge.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-content" id="timeline-tab">
+                        <div class="treatment-timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-date">August 2025</div>
+                                <div class="timeline-content">
+                                    <strong>Kognitive Umstrukturierung</strong><br>
+                                    Intensive Arbeit an automatischen Gedanken und kognitiven Verzerrungen. Deutliche Verbesserung der Symptomatik.
+                                </div>
+                            </div>
+
+                            <div class="timeline-item">
+                                <div class="timeline-date">Juli 2025</div>
+                                <div class="timeline-content">
+                                    <strong>Entspannungsverfahren</strong><br>
+                                    Einführung und Training verschiedener Entspannungstechniken. Progressive Muskelentspannung als Favorit identifiziert.
+                                </div>
+                            </div>
+
+                            <div class="timeline-item">
+                                <div class="timeline-date">Juni 2025</div>
+                                <div class="timeline-content">
+                                    <strong>Verhaltensexperimente</strong><br>
+                                    Erste erfolgreiche Exposition in sensu. Patient bereit für nächste Stufe der Behandlung.
+                                </div>
+                            </div>
+
+                            <div class="timeline-item">
+                                <div class="timeline-date">Mai 2025</div>
+                                <div class="timeline-content">
+                                    <strong>Diagnostik & Psychoedukation</strong><br>
+                                    Ausführliche Anamnese und Diagnostik. Aufklärung über Angststörungen und Behandlungsmöglichkeiten.
+                                </div>
+                            </div>
+
+                            <div class="timeline-item">
+                                <div class="timeline-date">März 2025</div>
+                                <div class="timeline-content">
+                                    <strong>Therapiebeginn</strong><br>
+                                    Erstgespräch und Aufbau der therapeutischen Beziehung. Vereinbarung der Therapieziele.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-content" id="notes-tab">
+                        <div style="background: #f8f9ff; padding: 25px; border-radius: 15px; border: 2px solid #eef2ff; margin-bottom: 20px;">
+                            <h4 style="color: #667eea; margin-bottom: 15px;">📋 Allgemeine Notizen</h4>
+                            <div>
+                                <p style="margin-bottom: 15px;"><strong>Besonderheiten:</strong> Patient ist sehr motiviert und zeigt hohe Therapiecompliance. Reagiert gut auf kognitive Interventionen.</p>
+                                <p style="margin-bottom: 15px;"><strong>Ressourcen:</strong> Stabile Partnerschaft, gute berufliche Situation, Interesse an Sport und Musik.</p>
+                                <p><strong>Risikofaktoren:</strong> Perfectionistische Tendenzen, hohe Selbstansprüche im beruflichen Kontext.</p>
+                            </div>
+                        </div>
+
+                        <div style="background: white; border: 2px solid #eef2ff; border-radius: 15px; padding: 25px;">
+                            <h4 style="color: #667eea; margin-bottom: 15px;">📝 Schnellnotiz hinzufügen</h4>
+                            <textarea class="form-textarea" placeholder="Neue Notiz eingeben..." style="margin-bottom: 15px;"></textarea>
+                            <button class="btn btn-primary">
+                                <span>💾</span> Notiz speichern
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
                 
                 <div style="margin-bottom: 30px; display: flex; gap: 15px;">
                     <button class="btn btn-primary" onclick="showModal('clientModal')">
