@@ -2051,6 +2051,60 @@ async function sendMessage() {
                 }, 2000);
             });
         });
+        // Client hinzufügen (Formular absenden)
+document.querySelector('#clientModal form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const client = {
+        initials: this.querySelector('input[placeholder="A.B."]').value,
+        diagnosis: this.querySelector('input[placeholder^="z.B."]').value,
+        therapy: this.querySelector('select').value,
+        notes: this.querySelector('textarea').value
+    };
+
+    const response = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(client)
+    });
+
+    if (response.ok) {
+        alert("Klient gespeichert!");
+        hideModal('clientModal');
+        loadClients();
+    }
+});
+
+// Alle Clients laden
+async function loadClients() {
+    const res = await fetch('/api/clients');
+    const clients = await res.json();
+
+    const grid = document.getElementById('clientGrid');
+    grid.innerHTML = '';
+    clients.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'client-card';
+        div.innerHTML = `
+            <div class="client-header">
+                <div class="client-initials">${c.initials}</div>
+                <div class="client-meta">
+                    <span class="tag">${c.diagnosis}</span>
+                    <span class="tag">${c.therapy}</span>
+                </div>
+            </div>
+            <div class="client-stats">
+                <span>📝 ${c.notes || 'Keine Notizen'}</span>
+            </div>
+        `;
+        grid.appendChild(div);
+    });
+
+    document.getElementById('clientsBadge').textContent = clients.length;
+}
+
+// Beim Start Clients laden
+document.addEventListener('DOMContentLoaded', loadClients);
     </script>
     <!-- Session Modal -->
     <div class="modal" id="sessionModal">
