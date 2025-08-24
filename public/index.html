@@ -894,6 +894,162 @@
                 width: 100%;
             }
         }
+        /* Erweiterte Client Details */
+        .client-details {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .client-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eef2ff;
+        }
+        
+        .detail-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .detail-tab {
+            padding: 10px 20px;
+            border: none;
+            background: #f8f9ff;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .detail-tab:hover {
+            background: #eef2ff;
+        }
+        
+        .detail-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .detail-content {
+            display: none;
+        }
+        
+        .detail-content.active {
+            display: block;
+        }
+        
+        .session-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .session-item {
+            background: #f8f9ff;
+            border: 2px solid #eef2ff;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+        
+        .session-item:hover {
+            border-color: #667eea;
+        }
+        
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .session-date {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .session-duration {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .session-notes {
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .treatment-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 25px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+        
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 17px;
+            width: 2px;
+            height: calc(100% - 12px);
+            background: #eef2ff;
+        }
+        
+        .timeline-date {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-content {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px solid #eef2ff;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
     </style>
 </head>
 <body>
