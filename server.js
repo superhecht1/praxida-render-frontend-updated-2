@@ -1,50 +1,47 @@
-// server.js
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import OpenAI from "openai";
-
-dotenv.config();
+const express = require('express');
+const path = require('path');
+const OpenAI = require('openai');
 
 const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 3000;
+
+// JSON Body Parser für API Requests
 app.use(express.json());
 
-// OpenAI-Client initialisieren
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Test-Endpoint
-app.get("/", (req, res) => {
-  res.send("Server läuft ✅");
-});
-
-// OpenAI Chat-Endpoint
-app.post("/api/chat", async (req, res) => {
-  try {
-    const { prompt } = req.body;
-
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt fehlt" });
+// Static Assets aus /public
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-store');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
+  }
+}));
 
-    const response = await openai.chat.completions.create({
+// API-Route für OpenAI
+app.post('/api/ask', async (req, res) => {
+  try {
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const userMessage = req.body.question || "Sag hallo!";
+    const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
+      messages: [{ role: "user", content: userMessage }],
     });
 
-    const text = response.choices[0].message.content;
-    res.json({ text });
-  } catch (error) {
-    console.error("OpenAI Fehler:", error);
-    res.status(500).json({ error: "Fehler beim Abrufen der OpenAI-Antwort" });
+    res.json({ answer: completion.choices[0].message.content });
+  } catch (err) {
+    console.error("OpenAI error:", err.message);
+    res.status(500).json({ error: "OpenAI request failed" });
   }
 });
 
-// Server starten
-const PORT = process.env.PORT || 3000;
+// Fallback zu index.html (für SPA-Routing)
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.listen(PORT, () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
