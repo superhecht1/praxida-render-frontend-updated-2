@@ -1446,61 +1446,40 @@
             }
         }
 
-       // Chat functionality - UPDATED VERSION
-async function sendMessage() {
-    const input = document.getElementById('chatInput');
-    const messages = document.getElementById('chatMessages');
-    
-    if (input.value.trim() === '') return;
-    
-    // Benutzer-Nachricht anzeigen
-    const userMessage = document.createElement('div');
-    userMessage.className = 'message user';
-    userMessage.innerHTML = `
-        <div class="message-meta">Sie • Jetzt</div>
-        ${input.value}
-    `;
-    messages.appendChild(userMessage);
-    
-    const messageText = input.value;
-    input.value = '';
-    
-    try {
-        // Echte API-Anfrage an Ihr Backend
-        const response = await fetch('/api/ask', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question: messageText })
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || 'API-Fehler');
+        // Chat functionality
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const messages = document.getElementById('chatMessages');
+            
+            if (input.value.trim() === '') return;
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.innerHTML = `
+                <div class="message-meta">Sie • Jetzt</div>
+                ${input.value}
+            `;
+            messages.appendChild(userMessage);
+            
+            // Clear input
+            const messageText = input.value;
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message assistant';
+                aiMessage.innerHTML = `
+                    <div class="message-meta">KI-Assistenz • Jetzt</div>
+                    Das ist eine sehr interessante Frage bezüglich ${messageText}. Basierend auf aktuellen Therapiestandards empfehle ich folgende Ansätze...
+                `;
+                messages.appendChild(aiMessage);
+                messages.scrollTop = messages.scrollHeight;
+            }, 1500);
+            
+            messages.scrollTop = messages.scrollHeight;
         }
-
-        // KI-Antwort anzeigen
-        const aiMessage = document.createElement('div');
-        aiMessage.className = 'message assistant';
-        aiMessage.innerHTML = `
-            <div class="message-meta">KI-Assistenz • Jetzt</div>
-            ${data.answer}
-        `;
-        messages.appendChild(aiMessage);
-        
-    } catch (error) {
-        // Fehler-Nachricht anzeigen
-        const errorMessage = document.createElement('div');
-        errorMessage.className = 'message assistant';
-        errorMessage.innerHTML = `
-            <div class="message-meta">System • Jetzt</div>
-            ❌ Fehler: ${error.message}
-        `;
-        messages.appendChild(errorMessage);
-    }
-    
-    messages.scrollTop = messages.scrollHeight;
-}
 
         // Quick search
         function performQuickSearch() {
