@@ -1,3 +1,6 @@
+// Laden Sie dotenv ganz am Anfang
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const OpenAI = require('openai');
@@ -22,18 +25,38 @@ app.use(express.static(path.join(__dirname, 'public'), {
 // API-Route für OpenAI
 app.post('/api/ask', async (req, res) => {
   try {
+    // Überprüfen ob API-Key vorhanden ist
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("FEHLER: OPENAI_API_KEY nicht gefunden in Umgebungsvariablen");
+      return res.status(500).json({ error: "OpenAI API-Key nicht konfiguriert" });
+    }
+
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const userMessage = req.body.question || "Sag hallo!";
+    
+    console.log("Sende Anfrage an OpenAI:", userMessage);
+    
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: userMessage }],
     });
 
-    res.json({ answer: completion.choices[0].message.content });
+    const answer = completion.choices[0].message.content;
+    console.log("OpenAI Antwort erhalten:", answer.substring(0, 100) + "...");
+    
+    res.json({ answer: answer });
   } catch (err) {
-    console.error("OpenAI error:", err.message);
-    res.status(500).json({ error: "OpenAI request failed" });
+    console.error("OpenAI Fehler Details:", err);
+    
+    // Spezifische Fehlermeldungen
+    if (err.status === 401) {
+      res.status(500).json({ error: "OpenAI API-Key ungültig" });
+    } else if (err.status === 429) {
+      res.status(500).json({ error: "OpenAI Rate-Limit erreicht" });
+    } else {
+      res.status(500).json({ error: `OpenAI Fehler: ${err.message}` });
+    }
   }
 });
 
@@ -43,6 +66,7 @@ app.get('*', (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server läuft auf Port ${PORT}`);
+  console.log(`OpenAI API-Key gesetzt: ${process.env.OPENAI_API_KEY ? 'JA' : 'NEIN'}`);
 });
 
