@@ -1447,40 +1447,83 @@
         }
 
         // Chat functionality
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const messages = document.getElementById('chatMessages');
-            
-            if (input.value.trim() === '') return;
-            
-            // Add user message
-            const userMessage = document.createElement('div');
-            userMessage.className = 'message user';
-            userMessage.innerHTML = `
-                <div class="message-meta">Sie • Jetzt</div>
-                ${input.value}
-            `;
-            messages.appendChild(userMessage);
-            
-            // Clear input
-            const messageText = input.value;
-            input.value = '';
-            
-            // Simulate AI response
-            setTimeout(() => {
-                const aiMessage = document.createElement('div');
-                aiMessage.className = 'message assistant';
-                aiMessage.innerHTML = `
-                    <div class="message-meta">KI-Assistenz • Jetzt</div>
-                    Das ist eine sehr interessante Frage bezüglich ${messageText}. Basierend auf aktuellen Therapiestandards empfehle ich folgende Ansätze...
-                `;
-                messages.appendChild(aiMessage);
-                messages.scrollTop = messages.scrollHeight;
-            }, 1500);
-            
-            messages.scrollTop = messages.scrollHeight;
+async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const messages = document.getElementById('chatMessages');
+    
+    if (input.value.trim() === '') return;
+    
+    // Add user message
+    const userMessage = document.createElement('div');
+    userMessage.className = 'message user';
+    userMessage.innerHTML = `
+        <div class="message-meta">Sie • Jetzt</div>
+        ${input.value}
+    `;
+    messages.appendChild(userMessage);
+    
+    // Store message and clear input
+    const messageText = input.value;
+    input.value = '';
+    
+    // Add loading indicator
+    const loadingMessage = document.createElement('div');
+    loadingMessage.className = 'message assistant loading';
+    loadingMessage.innerHTML = `
+        <div class="message-meta">KI-Assistenz • Tippt...</div>
+        Denke nach...
+    `;
+    messages.appendChild(loadingMessage);
+    messages.scrollTop = messages.scrollHeight;
+    
+    try {
+        // Call OpenAI API
+        const response = await fetch('/api/ask', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                question: `Als KI-Assistenz für Therapeuten: ${messageText}. Bitte gib eine professionelle, hilfreiche Antwort auf Deutsch.`
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('API-Anfrage fehlgeschlagen');
         }
-
+        
+        const data = await response.json();
+        
+        // Remove loading message
+        loadingMessage.remove();
+        
+        // Add AI response
+        const aiMessage = document.createElement('div');
+        aiMessage.className = 'message assistant';
+        aiMessage.innerHTML = `
+            <div class="message-meta">KI-Assistenz • Jetzt</div>
+            ${data.answer}
+        `;
+        messages.appendChild(aiMessage);
+        
+    } catch (error) {
+        console.error('Fehler beim Senden der Nachricht:', error);
+        
+        // Remove loading message
+        loadingMessage.remove();
+        
+        // Add error message
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'message assistant';
+        errorMessage.innerHTML = `
+            <div class="message-meta">KI-Assistenz • Fehler</div>
+            Entschuldigung, es gab einen Fehler bei der Verbindung zur KI. Bitte versuchen Sie es erneut.
+        `;
+        messages.appendChild(errorMessage);
+    }
+    
+    messages.scrollTop = messages.scrollHeight;
+}
         // Quick search
         function performQuickSearch() {
             const searchTerm = document.getElementById('quickSearch').value;
